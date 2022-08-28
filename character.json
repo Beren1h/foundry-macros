@@ -1,0 +1,11 @@
+{
+    "proficiency": 2,
+    "abilities": {
+        "strength": 1,
+        "dexterity": 2,
+        "constitution": 2,
+        "intelligence": 5,
+        "wisdom": 0,
+        "charisma": -1
+    }
+}
