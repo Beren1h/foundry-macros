@@ -15,8 +15,26 @@ new Dialog({
         .box label {
             width: 125px;
         }
+        .instruction {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background-color: #E8E8E8;
+            border-radius: 4px;
+            padding: 4px;
+        }
+        .instruction div {
+            font-size: 12px;
+            font-weight: 700
+        }
      </style>
-     <p class="outer">
+     <div class="outer">
+        <div class="box">
+            <div class="instruction">
+                <div>+CTRL advantage</div>
+                <div>+ALT disadvantage</div>
+            </div>
+        </div>
         <div class="box">
             <label>count</label>
             <input id="count" value=1 />
@@ -29,7 +47,7 @@ new Dialog({
                 <option value="8">8</option>
                 <option value="10">10</option>
                 <option value="12">12</option>
-                <option value="20">20</option>
+                <option value="20" selected>20</option>
                 <option value="100">100</option>
             </select>
         </div>
@@ -37,15 +55,7 @@ new Dialog({
             <label>modifer</label>
             <input id="mod" value=0 />
         </div>
-        <div class="box">
-            <label>roll adjustment</label>
-            <select id="ra">
-                <option value="0">normal</option>
-                <option value="1">advantage</option>
-                <option value="-1">disadvantage</option>
-            </select>
-        </div>
-     </p>
+     </div>
     `,
     render: (content) => {
         content.find('[id=count]')[0].focus();
@@ -57,47 +67,31 @@ new Dialog({
             label: "Roll",
             callback: async (content) => {
 
-                // let ability = content.find('[id=ab]')[0];
-                // let proficiency = content.find('[id=pm]')[0];
                 let count = content.find('[id=count]')[0];
                 let die = content.find('[id=die]')[0];
                 let modifer = content.find('[id=mod]')[0];
-                 let adjustment = content.find('[id=ra]')[0];
-                // let pb = content.find('[id=pb')[0].value;
-                // let am = parseFloat(ability.value);
-                // let pm = parseFloat(proficiency.value);
-                let ra = adjustment.value;
-                // let pbpm = Math.floor(pb * pm);
-                // let abilityPlus = am >= 0 ? "+" : "";
                 
                 let baseFormula = count.value + "d" + die.value;
 
-                switch(ra)
-                {
-                    case "1":
-                        baseFormula = "2d20kh"
-                        formulaWord = "(advantage)"
-                        break;
-                    case "-1":
+                if (window.event){
+                    if (!!window.event.shiftKey) {
+                        //what cool thing to do here?
+                    };
+                    if (!!window.event.altKey){
                         baseFormula = "2d20kl"
-                        formulaWord = "(disadvantage)"
-                        break;
-                    // default:
-                    //     formula = baseFormula
-                    //     formulaWord = ""
+                    };
+                    if (!!window.event.ctrlKey){
+                        baseFormula = "2d20kh"
+                    };
                 }
 
                 let roll = new Roll(baseFormula + "+" + modifer.value);
-                // let roll = new Roll(formula + "+" + am + "+" + pbpm);
                 
                 await roll.evaluate(async=true);
 
-                // <div>${abilityPlus}${am} ${ability.options[ability.selectedIndex].text}</div>
-                // <div>+${pbpm} ${proficiency.options[proficiency.selectedIndex].text}</div>
-
                 await roll.toMessage({
                     flavor: `
-                        idk
+                        universal dice roller
                     `
                 });
             }

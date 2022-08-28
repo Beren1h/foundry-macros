@@ -8,15 +8,36 @@ new Dialog({
         }
         .box {
             display: flex;
+            align-items: center;
             flex-direction: row;
             gap: 10px;
             margin: 0 0 10px 0;
         }
         .box label {
-            width: 150px;
+            display: block;
+            text-align: right;
+            width: 135px;
         }
+         .instruction {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background-color: #E8E8E8;
+            border-radius: 4px;
+            padding: 4px;
+        }
+        .instruction div {
+            font-size: 12px;
+            font-weight: 700
+        }        
      </style>
-     <p class="outer">
+     <div class="outer">
+        <div class="box">
+            <div class="instruction">
+                <div>+CTRL advantage</div>
+                <div>+ALT disadvantage</div>
+            </div>
+        </div>
         <div class="box">
             <label>ability score</label>
             <select id="ab">
@@ -29,7 +50,7 @@ new Dialog({
             </select>
         </div>
         <div class="box">
-            <label>proficency bonus</label>
+            <label>proficiency bonus</label>
             <select id="pb">
                 <option value="-2">-2</option>
                 <option value="2">+2</option>
@@ -45,15 +66,7 @@ new Dialog({
                 <option value="2">expertise</option>
             </select>
         </div>
-        <div class="box">
-            <label>roll adjustment</label>
-            <select id="ra">
-                <option value="0">normal</option>
-                <option value="1">advantage</option>
-                <option value="-1">disadvantage</option>
-            </select>
-        </div>
-     </p>
+     </div>
     `,
     render: (content) => {
         content.find('[id=ab]')[0].focus();
@@ -66,29 +79,26 @@ new Dialog({
 
                 let ability = content.find('[id=ab]')[0];
                 let proficiency = content.find('[id=pm]')[0];
-                let rollAdjustment = content.find('[id=ra]')[0];
                 let pb = content.find('[id=pb')[0].value;
                 let am = parseFloat(ability.value);
                 let pm = parseFloat(proficiency.value);
-                let ra = rollAdjustment.value;
                 let pbpm = Math.floor(pb * pm);
                 let abilityPlus = am >= 0 ? "+" : "";
                 
-                switch(ra)
-                {
-                    case "1":
-                        formula = "2d20kh"
-                        formulaWord = "(advantage)"
-                        break;
-                    case "-1":
-                        formula = "2d20kl"
-                        formulaWord = "(disadvantage)"
-                        break;
-                    default:
-                        formula = "1d20"
-                        formulaWord = ""
-                }
+                let formula = "1d20";
 
+                if (window.event){
+                    if (!!window.event.shiftKey) {
+                        //what cool thing to do here?
+                    };
+                    if (!!window.event.altKey){
+                        formula = "2d20kl"
+                    };
+                    if (!!window.event.ctrlKey){
+                        formula = "2d20kh"
+                    };
+                }
+                
                 let roll = new Roll(formula + "+" + am + "+" + pbpm);
                 
                 await roll.evaluate(async=true);
