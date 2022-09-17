@@ -1,21 +1,22 @@
-function CreateRoll(formula)
+let data = [
+    {
+        "flavor": "warrior bug stab",
+        "formula": "1d20 + 6",
+        "modifer": ""
+    }
+]
+
+function BuildOptions()
 {
-    return new Roll(formula);
-}
-
-async function SendRollToChat(roll, flavor){
-    
-    await roll.evaluate(async=true);
-
-    return roll.toMessage({
-        flavor: `
-            ${flavor}
-        `
+    let s = "";
+    data.forEach(roll => {
+        s = s + "<option value=\"" + roll.formula + "\">" + roll.flavor + "</option>"
     });
+    return s;
 }
 
 new Dialog({
-    title: "Universal Dice Roller",
+    title: "Packaged Rolls",
     content: `
      <style>
         .outer {
@@ -49,13 +50,8 @@ new Dialog({
             <div class="instruction">
                 <div>+CTRL advantage</div>
                 <div>+ALT disadvantage</div>
-                <div>+SHIFT roll twice</div>
             </div>
         </div>
-        <div class="box">
-            <label>modifer</label>
-            <input id="mod" value=0 />
-        </div>        
         <div class="box">
             <label>count</label>
             <input id="count" value=1 />
@@ -72,11 +68,21 @@ new Dialog({
                 <option value="100">100</option>
             </select>
         </div>
+        <div class="box">
+            <label>packaged</label>
+            <select id="pack">
+                ${BuildOptions()}
+            </select>
+        </div>        
+        <div class="box">
+            <label>modifer</label>
+            <input id="mod" value=0 />
+        </div>
      </div>
     `,
     render: (content) => {
-        content.find('[id=mod]')[0].focus();
-        content.find('[id=mod]')[0].select();
+        content.find('[id=count]')[0].focus();
+        content.find('[id=count]')[0].select();
     },
     buttons: {
         one: {
@@ -90,44 +96,27 @@ new Dialog({
                 
                 let baseFormula = count.value + "d" + die.value;
 
-                let shift = !!window.event.shiftKey;
-                let ctrl = !!window.event.ctrlKey;
-                let alt = !!window.event.altKey;
-
-                const baseFlavor = "universal dice roller"
-
-                let flavors = [ baseFlavor ]
-
                 if (window.event){
-                    if (shift) {
-                        flavors = [
-                            baseFlavor + " (1 of 2)",
-                            baseFlavor + " (2 of 2)"
-                        ]
+                    if (!!window.event.shiftKey) {
+                        //what cool thing to do here?
                     };
-                    if (alt){
+                    if (!!window.event.altKey){
                         baseFormula = "2d20kl"
                     };
-                    if (ctrl){
+                    if (!!window.event.ctrlKey){
                         baseFormula = "2d20kh"
                     };
                 }
+
+                let roll = new Roll(baseFormula + "+" + modifer.value);
                 
-                let operator = modifer.value < 0 ? "-" : "+";
-                let formula = baseFormula + operator + Math.abs(modifer.value);
+                await roll.evaluate(async=true);
 
-                await SendRollToChat(
-                    CreateRoll(formula), 
-                    flavors[0]
-                );
-
-                if (shift)
-                {
-                    await SendRollToChat(
-                        CreateRoll(formula),
-                        flavors[1]
-                    );
-                }
+                await roll.toMessage({
+                    flavor: `
+                        universal dice roller
+                    `
+                });
             }
         },
         two: {
@@ -139,3 +128,4 @@ new Dialog({
     default: "one",
     close: () => {}
 }).render(true);
+

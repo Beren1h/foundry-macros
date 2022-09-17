@@ -7,5 +7,48 @@
         "intelligence": 5,
         "wisdom": 0,
         "charisma": -1
-    }
+    },
+    "inserts": [
+        {
+            "slot": "attack",
+            "name": "unarmed strike",
+            "die": "1",
+            "ability": [
+                "str"
+            ]
+        },        
+        {
+            "slot": "attack",
+            "name": "dagger",
+            "die": "1d4",
+            "ability": [
+                "str",
+                "dex"
+            ]
+        }
+    ],
+    "spells": [
+        {
+            "name": "fireball",
+            "level": "3rd",
+            "range": "60ft",
+            "castingTime": "1 action",
+            "description": "shoot fire. big boom. 8d6 fire damage"
+        }
+    ],
+    "actions": [
+        {
+            "name": "attack",
+            "inserts": [
+                "unarmed strike",
+                "dagger"
+            ]
+        },
+        {
+            "name": "cast a spell",
+            "inserts": [
+                "fireball"
+            ]
+        }
+    ]
 }
